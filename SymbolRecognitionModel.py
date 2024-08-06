@@ -7,10 +7,8 @@ import os
 
 class SymbolRecognitionModel:
     def __init__(self, model_path):
-        # Load the Keras model
         self.model = load_model(model_path)
-        self.IMG_SIZE = 48  # Model expects 48x48 input images
-
+        self.IMG_SIZE = 48
     def preprocess_image(self, img):
         """ Resize and normalize the image for the model. """
         if len(img.shape) == 2:  # Image is already grayscale
@@ -21,9 +19,9 @@ class SymbolRecognitionModel:
         else:
             raise ValueError("Unexpected image shape, cannot preprocess image.")
 
-        img = img / 255.0  # Normalize the image
-        img = np.expand_dims(img, axis=-1)  # Add channel dimension
-        img = np.expand_dims(img, axis=0)  # Add batch dimension
+        img = img / 255.0
+        img = np.expand_dims(img, axis=-1)
+        img = np.expand_dims(img, axis=0)
         return img
 
 
@@ -33,7 +31,7 @@ class SymbolRecognitionModel:
         prediction = self.model.predict(processed_img)
         predicted_class = np.argmax(prediction)
         confidence = np.max(prediction)
-        return predicted_class, confidence  # Return the class and the confidence of the prediction
+        return predicted_class, confidence
 
     def convert_pdf_to_images(self, pdf_path):
         document = fitz.open(pdf_path)
@@ -67,10 +65,8 @@ class SymbolRecognitionModel:
         img = cv2.GaussianBlur(img, (5, 5), 0)
         img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
                                     cv2.THRESH_BINARY_INV, 11, 2)
-
         kernel = np.ones((3, 3), np.uint8)
         img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
-
         contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         predictions = []
         for cnt in contours:

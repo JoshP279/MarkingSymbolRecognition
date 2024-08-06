@@ -35,7 +35,6 @@ def preprocess_and_save_images(input_folder, output_folder, img_size=(48, 48), c
 
 # Preprocess and save images for each category
 preprocess_and_save_images('raw_data/ticks', 'data/ticks', img_size=(48, 48), color_mode='grayscale')
-preprocess_and_save_images('raw_data/crosses', 'data/crosses', img_size=(48, 48), color_mode='grayscale')
 preprocess_and_save_images('raw_data/others', 'data/others', img_size=(48, 48), color_mode='grayscale')
 
 # Step 2: Load the Preprocessed Data
@@ -52,20 +51,16 @@ def load_images_from_folder(folder, label, img_size=(48, 48)):
     return np.array(images), np.array(labels)
 
 # Load data from preprocessed folders
-ticks_images, ticks_labels = load_images_from_folder('data/ticks', 0)
-crosses_images, crosses_labels = load_images_from_folder('data/crosses', 1)
-other_images, other_labels = load_images_from_folder('data/others', 2)
+ticks_images, ticks_labels = load_images_from_folder('data/ticks', 1)
+other_images, other_labels = load_images_from_folder('data/others', 0)
 
 # Combine and shuffle data
-X = np.concatenate((ticks_images, crosses_images, other_images), axis=0)
-y = np.concatenate((ticks_labels, crosses_labels, other_labels), axis=0)
+X = np.concatenate((ticks_images, other_images), axis=0)
+y = np.concatenate((ticks_labels, other_labels), axis=0)
 
 # Normalize the data
 X = X / 255.0
 X = X.reshape(-1, 48, 48, 1)  # Add channel dimension
-
-# One-hot encode labels
-y = to_categorical(y, num_classes=3)
 
 # Split the data into training and validation sets
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -80,11 +75,11 @@ model = Sequential([
     MaxPooling2D(2, 2),
     Flatten(),
     Dense(64, activation='relu'),
-    Dense(3, activation='softmax')
+    Dense(1, activation='sigmoid')  # Binary classification: tick or no tick
 ])
 
 # Step 4: Compile and Train the Model
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
 # Data augmentation
 datagen = ImageDataGenerator(rotation_range=15, width_shift_range=0.1, height_shift_range=0.1, horizontal_flip=True)
@@ -93,4 +88,4 @@ datagen = ImageDataGenerator(rotation_range=15, width_shift_range=0.1, height_sh
 model.fit(datagen.flow(X_train, y_train, batch_size=32), epochs=100, validation_data=(X_val, y_val))
 
 # Step 5: Save the Model
-model.save('symbol_recognition_model.h5')
+model.save('tick_detection_model.h5')

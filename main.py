@@ -15,12 +15,5 @@ import os
 # # Predict from PDF and optionally save or display images
 # mnist_model.predict_from_pdf("submission_5.pdf")
 
-# Path to the trained Keras model
-model_path = "symbol_recognition_model.h5"
-
-# Initialize the symbol recognition model
-symbol_model = SymbolRecognitionModel(model_path)
-
-# Predict from a PDF file and optionally save or display images
-pdf_file = "submission_7.pdf"
-symbol_model.predict_from_pdf(pdf_file)
+symbol_model = SymbolRecognitionModel("tick_detection_model.h5")
+symbol_model.predict_from_pdf("submission_9.pdf")

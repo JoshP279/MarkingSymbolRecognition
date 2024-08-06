@@ -81,7 +81,7 @@ class SymbolRecognitionModel:
                 symbol = self.resize_and_pad(symbol, self.IMG_SIZE)
                 predicted_class, confidence = self.predict_symbol(symbol)
                 print(f"Predicted class: {predicted_class}, Confidence: {confidence:.2f}")
-                if confidence > 0.9:
+                if confidence > 0.3:
                     predictions.append((predicted_class, confidence, (x, y, w, h)))
                     plt.figure(figsize=(2, 2))
                     plt.imshow(symbol, cmap='gray')
@@ -97,6 +97,7 @@ class SymbolRecognitionModel:
         return predictions
 
     def predict_from_pdf(self, pdf_path):
+        ticks = 0
         images = self.convert_pdf_to_images(pdf_path)
         for img_data in images:
             img = cv2.imdecode(np.frombuffer(img_data, np.uint8), cv2.IMREAD_COLOR)
@@ -106,8 +107,9 @@ class SymbolRecognitionModel:
             predictions = self.segment_and_predict(img)
             for predicted_class, confidence, (x, y, w, h) in predictions:
                 if predicted_class == 0:
+                    ticks+=1
                     print(f"Tick detected with confidence {confidence:.2f} at position ({x}, {y}, {w}, {h})")
-                elif predicted_class == 1:
-                    print(f"Cross detected with confidence {confidence:.2f} at position ({x}, {y}, {w}, {h})")
                 else:
                     print(f"Other symbol detected with confidence {confidence:.2f} at position ({x}, {y}, {w}, {h})")
+
+        print(f"Total ticks detected: {ticks}")

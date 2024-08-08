@@ -85,7 +85,7 @@ model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy']
 datagen = ImageDataGenerator(rotation_range=15, width_shift_range=0.1, height_shift_range=0.1, horizontal_flip=True)
 
 # Train the model using the training data generator and validation data
-model.fit(datagen.flow(X_train, y_train, batch_size=32), epochs=100, validation_data=(X_val, y_val))
+model.fit(datagen.flow(X_train, y_train, batch_size=32), epochs=10, validation_data=(X_val, y_val))
 
 # Step 5: Save the Model
 model.save('tick_detection_model.h5')

@@ -1,7 +1,7 @@
 from keras.models import load_model
 import cv2
 import numpy as np
-import fitz  # PyMuPDF
+import fitz  # pip install PyMuPDF
 import matplotlib.pyplot as plt
 import os
 
@@ -9,6 +9,7 @@ class SymbolRecognitionModel:
     def __init__(self, model_path):
         self.model = load_model(model_path)
         self.IMG_SIZE = 48
+        
     def preprocess_image(self, img):
         """ Resize and normalize the image for the model. """
         if len(img.shape) == 2:  # Image is already grayscale
@@ -67,6 +68,10 @@ class SymbolRecognitionModel:
                                     cv2.THRESH_BINARY_INV, 11, 2)
         kernel = np.ones((3, 3), np.uint8)
         img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+        plt.figure(figsize=(2, 2))
+        plt.imshow(img, cmap='gray')
+        plt.axis('off')
+        plt.show()
         contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         predictions = []
         for cnt in contours:
@@ -94,9 +99,12 @@ class SymbolRecognitionModel:
 
     def predict_from_pdf(self, pdf_path):
         ticks = 0
+        count =1 
         images = self.convert_pdf_to_images(pdf_path)
         for img_data in images:
+            count+=1
             img = cv2.imdecode(np.frombuffer(img_data, np.uint8), cv2.IMREAD_COLOR)
+            print(f"Processing image {count}")
             if img is None:
                 print("Could not decode image from PDF.")
                 continue

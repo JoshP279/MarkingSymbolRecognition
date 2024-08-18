@@ -1,19 +1,27 @@
-from MNISTModel import MNISTModel
-from SymbolRecognitionModel import SymbolRecognitionModel
 import os
+import sys
+from MNISTModel import MNISTModel  # If you need this in the future
+from SymbolRecognitionModel import SymbolRecognitionModel
 
-# mnist_model = MNISTModel()
+def main(pdf_path, submission_id, show_plots=False):
+    model_path = "C:\\Users\\Joshua\\MarkingSymbolRecognition\\tick_detection_model.h5"  # Use absolute path
+    symbol_model = SymbolRecognitionModel(model_path)
+    
+    # Mark the submission
+    symbol_model.predict_from_pdf(pdf_path, show_plots=show_plots)
 
-# model_path = "mnist_model.h5"
-# if os.path.exists(model_path):
-#     mnist_model.load_model(model_path)
-# else:
-#     mnist_model.build_model()
-#     mnist_model.train_model()
-#     mnist_model.save_model(model_path)
+    # You can also include code to update the database or log the results as needed
+    print(f"Finished processing submission ID: {submission_id}")
 
-# # Predict from PDF and optionally save or display images
-# mnist_model.predict_from_pdf("submission_5.pdf")
+if __name__ == "__main__":
+    # if len(sys.argv) < 3:
+    #     print("Usage: script.py <pdf_path> <submission_id> [--show-plots]")
+    #     sys.exit(1)
 
-symbol_model = SymbolRecognitionModel("tick_detection_model.h5")
-symbol_model.predict_from_pdf("submission_9.pdf")
+    # pdf_path = sys.argv[1]
+    # submission_id = sys.argv[2]
+    # show_plots = "--show-plots" in sys.argv
+    pdf_path = "submission_9.pdf"
+    submission_id = pdf_path.split("_")[1].split(".")[0]
+    show_plots = True
+    main(pdf_path, submission_id, show_plots=show_plots)

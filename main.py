@@ -14,14 +14,14 @@ def main(pdf_path, submission_id, show_plots=False):
     print(f"Finished processing submission ID: {submission_id}")
 
 if __name__ == "__main__":
-    # if len(sys.argv) < 3:
-    #     print("Usage: script.py <pdf_path> <submission_id> [--show-plots]")
-    #     sys.exit(1)
+    if len(sys.argv) < 3:
+        print("Usage: script.py <pdf_path> <submission_id> [--show-plots]")
+        sys.exit(1)
 
-    # pdf_path = sys.argv[1]
-    # submission_id = sys.argv[2]
-    # show_plots = "--show-plots" in sys.argv
-    pdf_path = "submission_9.pdf"
-    submission_id = pdf_path.split("_")[1].split(".")[0]
-    show_plots = True
+    pdf_path = sys.argv[1]
+    submission_id = sys.argv[2]
+    show_plots = "--show-plots" in sys.argv
+    # pdf_path = "submission_9.pdf"
+    # submission_id = pdf_path.split("_")[1].split(".")[0]
+    # show_plots = True
     main(pdf_path, submission_id, show_plots=show_plots)

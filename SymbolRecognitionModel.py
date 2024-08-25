@@ -146,3 +146,5 @@ class SymbolRecognitionModel:
         for heading, count in ticks_per_heading.items():
             print(f"{heading}: {count} tick(s)")
 
+        return total_ticks
+

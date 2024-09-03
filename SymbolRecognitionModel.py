@@ -101,7 +101,7 @@ class SymbolRecognitionModel:
                 symbol = self.resize_and_pad(symbol, self.IMG_SIZE)
                 predicted_class, confidence = self.predict_symbol(symbol)
                 print(f"Predicted class: {predicted_class}, Confidence: {confidence:.2f}")
-                if confidence > 0.6 and round(confidence,2) != 1:  # Adjust confidence threshold
+                if confidence > 0.6:  # Adjust confidence threshold
                     predictions.append((predicted_class, confidence, (x, y, w, h)))
                     if show_plots:
                         plt.figure(figsize=(2, 2))

@@ -19,7 +19,6 @@ def update_submission_mark(server_url, submission_id, total_mark):
 
 def main(pdf_path, submission_id, TotalMark, MarkingStyle, show_plots=False):
     MarkingStyle = MarkingStyle.strip().strip('"')
-    print(MarkingStyle == "Right Handed Ticks")
     if MarkingStyle == "Right Handed Ticks":
         # model_path = "C:\\MarkingSymbolRecognition\\right_handed_ticks.h5" # honours lab pc
         model_path = "C:\\Users\\Joshua\\MarkingSymbolRecognition\\right_handed_ticks.h5" # josh's pc

@@ -34,7 +34,7 @@ def main(pdf_path, submission_id, TotalMark, MarkingStyle, show_plots=False):
         print(f"No ticks detected for submission ID {submission_id}.")
         total_mark = 0
     else:
-        total_mark = (float(ticks_detected) / float(TotalMark)) * 100
+        total_mark = round((float(ticks_detected) / float(TotalMark)) * 100,2)
 
     # Update submission mark on the server
     server_url = "http://10.0.0.107:3306/updateSubmissionMark"

@@ -46,13 +46,28 @@ def preprocess_and_save_images(input_folder, output_folder, invert, img_size=(48
         output_path = os.path.join(output_folder, filename)
         cv2.imwrite(output_path, img)
 
-# Preprocess and save inverted images for each category to simulate left-handed ticks
-invert = False
-preprocess_and_save_images('raw_data/ticks', 'data/ticks', img_size=(48, 48), color_mode='grayscale', invert=invert)
-preprocess_and_save_images('raw_data/half_ticks', 'data/half_ticks', img_size=(48, 48), color_mode='grayscale', invert=invert)
-preprocess_and_save_images('raw_data/messy_half_ticks', 'data/messy_half_ticks', img_size=(48, 48), color_mode='grayscale', invert=invert)
-preprocess_and_save_images('raw_data/messy_ticks', 'data/messy_ticks', img_size=(48, 48), color_mode='grayscale', invert=invert)
+def filter_valid_data(images, labels, valid_range=(0, 3)):
+    """
+    Filters out data that contains labels outside the valid range.
 
+    Args:
+        images (np.array): Array of images.
+        labels (np.array): Array of labels corresponding to the images.
+        valid_range (tuple): Tuple specifying the valid range of labels (inclusive).
+
+    Returns:
+        np.array: Filtered images.
+        np.array: Filtered labels.
+    """
+    valid_indices = np.where((labels >= valid_range[0]) & (labels <= valid_range[1]))[0]
+    return images[valid_indices], labels[valid_indices]
+# Preprocess and save inverted images for each category to simulate left-handed ticks
+inverted = False
+
+preprocess_and_save_images('raw_data/ticks', 'data/ticks', img_size=(48, 48), color_mode='grayscale', invert=inverted)
+preprocess_and_save_images('raw_data/half_ticks', 'data/half_ticks', img_size=(48, 48), color_mode='grayscale', invert=inverted)
+preprocess_and_save_images('raw_data/messy_half_ticks', 'data/messy_half_ticks', img_size=(48, 48), color_mode='grayscale', invert=inverted)
+preprocess_and_save_images('raw_data/messy_ticks', 'data/messy_ticks', img_size=(48, 48), color_mode='grayscale', invert=inverted)
 
 def load_images_from_folder(folder, label, img_size=(48, 48)):
     images = []
@@ -69,25 +84,31 @@ def load_images_from_folder(folder, label, img_size=(48, 48)):
 
 # Load data for left-handed ticks, half-ticks, and neither
 ticks_images, ticks_labels = load_images_from_folder('data/ticks', 0)
-half_ticks_images, half_ticks_labels = load_images_from_folder('data/half_ticks', 1)
-messy_half_ticks_images, messy_half_ticks_labels = load_images_from_folder('data/messy_half_ticks', 2)
-messy_ticks_images, messy_ticks_labels = load_images_from_folder('data/messy_ticks', 3)
+messy_ticks_images, messy_ticks_labels = load_images_from_folder('data/messy_ticks', 1)
+half_ticks_images, half_ticks_labels = load_images_from_folder('data/half_ticks', 2)
+messy_half_ticks_images, messy_half_ticks_labels = load_images_from_folder('data/messy_half_ticks', 3)
 
 # Combine data including messy ticks
-X = np.concatenate([ticks_images, half_ticks_images, messy_half_ticks_images, messy_ticks_images], axis=0)
-y = np.concatenate([ticks_labels, half_ticks_labels, messy_half_ticks_labels, messy_ticks_labels], axis=0)
+X = np.concatenate([ticks_images, messy_ticks_images, half_ticks_images, messy_half_ticks_images], axis=0)
+y = np.concatenate([ticks_labels, messy_ticks_labels, half_ticks_labels, messy_half_ticks_labels], axis=0)
+
 
 X = X / 255.0
 
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=42)
+# Filter out problematic data (labels outside the range of 0 to 3)
+X_filtered, y_filtered = filter_valid_data(X, y, valid_range=(0, 3))
+
+# Proceed with training using the filtered data
+X_train, X_val, y_train, y_val = train_test_split(X_filtered, y_filtered, test_size=0.2, random_state=42)
+
 unique_classes = np.unique(y_train)
 class_weights = compute_class_weight(class_weight='balanced', classes=unique_classes, y=y_train)
 class_weight_dict = dict(zip(unique_classes, class_weights))
 
-class_weight_dict[0] *= 3 # Regular ticks
-class_weight_dict[1] *= 0.5  # Half-ticks
-class_weight_dict[2] *= 1.0  # Messy half-ticks
-class_weight_dict[3] *= 3  # Messy ticks
+# class_weight_dict[0] *= 3 # Regular ticks
+# class_weight_dict[1] *= 100messy_half_ticks_labels  # Half-ticks
+class_weight_dict[2] *= 0.3  # Messy half-ticks
+# class_weight_dict[3] *= 0.4  # Messy ticks
 
 
 
@@ -127,14 +148,15 @@ datagen = ImageDataGenerator(
 
 early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 
-model.fit(datagen.flow(X_train, y_train, batch_size=32), 
-          epochs=6, 
+model.fit(X_train, y_train, 
+          epochs=10, 
+          batch_size=32, 
           validation_data=(X_val, y_val), 
           class_weight=class_weight_dict,
           callbacks=[early_stopping])
 
 
-if (invert): 
+if (inverted): 
     model.save('left_handed_ticks.h5')
 else:
     model.save('right_handed_ticks.h5')

@@ -100,9 +100,9 @@ class SymbolRecognitionModel:
                 symbol = self.resize_and_pad(symbol, self.IMG_SIZE)
                 predicted_class, confidence = self.predict_symbol(symbol)
                 pred = "Clean Tick" if predicted_class == 0 else "Messy Tick" if predicted_class == 1 else "Half-Tick" if predicted_class == 2 else "Messy Half-Tick"
-                print(f"{pred}, Confidence: {confidence:.2f}")
-                if confidence > 0:  # Adjust confidence threshold
+                if confidence > 0.6:  # Adjust confidence threshold
                     predictions.append((predicted_class, confidence, (x, y, w, h)))
+                    print(f"{pred}, Confidence: {confidence:.2f}")
                     if show_plots:
                         plt.figure(figsize=(2, 2))
                         plt.imshow(symbol, cmap='gray')
@@ -133,10 +133,8 @@ class SymbolRecognitionModel:
                     if heading_key not in ticks_per_heading:
                         ticks_per_heading[heading_key] = 0
                     ticks_per_heading[heading_key] += 1
-                    print(f"Tick detected with confidence {confidence:.2f} at position ({x}, {y}, {w}, {h})")
                 elif predicted_class == 2 or predicted_class == 3:
                     total_ticks += 0.5
-                    print(f"Half-tick detected with confidence {confidence:.2f} at position ({x}, {y}, {w}, {h})")
                     heading_key = current_headings[-1] if current_headings else f"Page {page_num + 1}"
                     if heading_key not in ticks_per_heading:
                         ticks_per_heading[heading_key] = 0

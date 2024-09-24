@@ -6,11 +6,14 @@ from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 from sklearn.utils.class_weight import compute_class_weight
 from keras.callbacks import EarlyStopping
+from keras.layers import BatchNormalization
+from keras.layers import Activation
 import numpy as np
 import os
 import cv2
 
 def preprocess_and_save_images(input_folder, output_folder, invert, img_size=(48, 48), color_mode='grayscale'):
+    print(f'Preprocessing images from {input_folder} and saving to {output_folder}...')
     if os.path.exists(output_folder):
         for file in os.listdir(output_folder):
             file_path = os.path.join(output_folder, file)
@@ -99,17 +102,16 @@ X = X / 255.0
 X_filtered, y_filtered = filter_valid_data(X, y, valid_range=(0, 3))
 
 # Proceed with training using the filtered data
-X_train, X_val, y_train, y_val = train_test_split(X_filtered, y_filtered, test_size=0.2, random_state=42)
+X_train, X_val, y_train, y_val = train_test_split(X_filtered, y_filtered, test_size=0.3, random_state=42)
 
 unique_classes = np.unique(y_train)
 class_weights = compute_class_weight(class_weight='balanced', classes=unique_classes, y=y_train)
 class_weight_dict = dict(zip(unique_classes, class_weights))
 
-# class_weight_dict[0] *= 3 # Regular ticks
-# class_weight_dict[1] *= 100messy_half_ticks_labels  # Half-ticks
-class_weight_dict[2] *= 0.3  # Messy half-ticks
-# class_weight_dict[3] *= 0.4  # Messy ticks
-
+class_weight_dict[0] *= 3  # Regular ticks
+class_weight_dict[1] *= 0.1  # Half ticks
+class_weight_dict[2] *= 0.1  # Messy half ticks
+class_weight_dict[3] *= 3  # Messy ticks
 
 
 model = Sequential([
@@ -146,15 +148,14 @@ datagen = ImageDataGenerator(
 
 
 
-early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
 
 model.fit(X_train, y_train, 
-          epochs=10, 
+          epochs=20, 
           batch_size=32, 
           validation_data=(X_val, y_val), 
           class_weight=class_weight_dict,
           callbacks=[early_stopping])
-
 
 if (inverted): 
     model.save('left_handed_ticks.h5')

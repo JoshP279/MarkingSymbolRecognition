@@ -100,7 +100,7 @@ class SymbolRecognitionModel:
                 symbol = self.resize_and_pad(symbol, self.IMG_SIZE)
                 predicted_class, confidence = self.predict_symbol(symbol)
                 pred = "Clean Tick" if predicted_class == 0 else "Messy Tick" if predicted_class == 1 else "Half-Tick" if predicted_class == 2 else "Messy Half-Tick"
-                if confidence > 0.6:  # Adjust confidence threshold
+                if confidence > 0.5:  # Adjust confidence threshold
                     predictions.append((predicted_class, confidence, (x, y, w, h)))
                     print(f"{pred}, Confidence: {confidence:.2f}")
                     if show_plots:

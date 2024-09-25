@@ -9,6 +9,7 @@ class SymbolRecognitionModel:
     def __init__(self, model_path):
         self.model = load_model(model_path)
         self.IMG_SIZE = 48
+        self.ticks_per_heading = {}
 
     def preprocess_image(self, img):
         if len(img.shape) == 2:  # Image is already grayscale
@@ -112,7 +113,6 @@ class SymbolRecognitionModel:
         return predictions
 
     def predict_from_pdf(self, pdf_path, show_plots=False):
-        ticks_per_heading = {}
         total_ticks = 0
 
         images, headings = self.convert_pdf_to_images(pdf_path)
@@ -130,19 +130,18 @@ class SymbolRecognitionModel:
                 if predicted_class == 0 or predicted_class == 1:
                     total_ticks += 1
                     heading_key = current_headings[-1] if current_headings else f"Page {page_num + 1}"
-                    if heading_key not in ticks_per_heading:
-                        ticks_per_heading[heading_key] = 0
-                    ticks_per_heading[heading_key] += 1
+                    if heading_key not in self.ticks_per_heading:
+                        self.ticks_per_heading[heading_key] = 0
+                    self.ticks_per_heading[heading_key] += 1
                 elif predicted_class == 2 or predicted_class == 3:
                     total_ticks += 0.5
                     heading_key = current_headings[-1] if current_headings else f"Page {page_num + 1}"
-                    if heading_key not in ticks_per_heading:
-                        ticks_per_heading[heading_key] = 0
-                    ticks_per_heading[heading_key] += 1
+                    if heading_key not in self.ticks_per_heading:
+                        self.ticks_per_heading[heading_key] = 0
+                    self.ticks_per_heading[heading_key] += 0.5
 
         print(f"Total ticks detected: {total_ticks}")
-        for heading, count in ticks_per_heading.items():
+        for heading, count in self.ticks_per_heading.items():
             print(f"{heading}: {count} tick(s)")
 
-        return total_ticks
-
+        return total_ticks, self.ticks_per_heading

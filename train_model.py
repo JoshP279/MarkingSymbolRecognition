@@ -108,10 +108,10 @@ unique_classes = np.unique(y_train)
 class_weights = compute_class_weight(class_weight='balanced', classes=unique_classes, y=y_train)
 class_weight_dict = dict(zip(unique_classes, class_weights))
 
-class_weight_dict[0] *= 3  # Regular ticks
-class_weight_dict[1] *= 0.1  # Half ticks
-class_weight_dict[2] *= 0.1  # Messy half ticks
-class_weight_dict[3] *= 3  # Messy ticks
+# class_weight_dict[0] *= 3  # Regular ticks
+# class_weight_dict[1] *= 0.1  # Half ticks
+# class_weight_dict[2] *= 0.1  # Messy half ticks
+# class_weight_dict[3] *= 3  # Messy ticks
 
 
 model = Sequential([
@@ -151,7 +151,7 @@ datagen = ImageDataGenerator(
 early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
 
 model.fit(X_train, y_train, 
-          epochs=20, 
+          epochs=50, 
           batch_size=32, 
           validation_data=(X_val, y_val), 
           class_weight=class_weight_dict,

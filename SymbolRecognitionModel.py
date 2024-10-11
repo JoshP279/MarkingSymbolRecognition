@@ -108,8 +108,10 @@ class SymbolRecognitionModel:
                     pred = "Half-Tick"
                 elif predicted_class == 3:
                     pred = "Messy Half-Tick"
+                else:
+                    pred = "Non-Tick"
 
-                if confidence >= 0.8:
+                if confidence >= 0:
                     predictions.append((predicted_class, confidence, (x, y, w, h)))
                     print(f"{pred}, Confidence: {confidence:.5f}")
                     if show_plots:

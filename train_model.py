@@ -108,12 +108,6 @@ unique_classes = np.unique(y_train)
 class_weights = compute_class_weight(class_weight='balanced', classes=unique_classes, y=y_train)
 class_weight_dict = dict(zip(unique_classes, class_weights))
 
-# class_weight_dict[0] *= 3  # Regular ticks
-# class_weight_dict[1] *= 0.1  # Half ticks
-# class_weight_dict[2] *= 0.1  # Messy half ticks
-# class_weight_dict[3] *= 3  # Messy ticks
-
-
 model = Sequential([
     Conv2D(64, (3, 3), activation='relu', input_shape=(48, 48, 1)),
     MaxPooling2D(2, 2),
@@ -131,27 +125,12 @@ model = Sequential([
     Dense(4, activation='softmax')
 ])
 
-
-
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-
-datagen = ImageDataGenerator(
-    rotation_range=30,            # Increase rotation range
-    width_shift_range=0.2,        # Shift the image horizontally
-    height_shift_range=0.2,       # Shift the image vertically
-    shear_range=0.2,              # Shearing transformations
-    zoom_range=0.2,               # Random zoom
-    horizontal_flip=True,         # Randomly flip images
-    brightness_range=[0.8, 1.2],  # Random brightness adjustment
-    fill_mode='nearest'           # Fill in pixels after transformation
-)
-
-
 
 early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
 
 model.fit(X_train, y_train, 
-          epochs=50, 
+          epochs=5, 
           batch_size=32, 
           validation_data=(X_val, y_val), 
           class_weight=class_weight_dict,

@@ -1,7 +1,7 @@
 import os
 
 # Define the path to your folder
-folder = "C:\\Users\\Joshua\\MarkingSymbolRecognition\\raw_data\\half_ticks"
+folder = "C:\\Users\\Joshua\\MarkingSymbolRecognition\\raw_data\\messy_half_ticks"
 
 files = os.listdir(folder)
 

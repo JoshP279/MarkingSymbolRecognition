@@ -37,11 +37,9 @@ def update_question_mark(server_url, submission_id, question_id, mark_allocation
 def main(pdf_path, submission_id, TotalMark, MarkingStyle, show_plots=False):
     MarkingStyle = MarkingStyle.strip().strip('"')
     if MarkingStyle == "Right Handed Ticks":
-        # model_path = "C:\\MarkingSymbolRecognition\\right_handed_ticks.h5" # honours lab pc
-        model_path = "C:\\Users\\Joshua\\MarkingSymbolRecognition\\right_handed_ticks.h5" # josh's pc
+        model_path = os.path.join(os.getcwd(), "right_handed_ticks.h5") # josh's pc
     else:
-          # model_path = "C:\\MarkingSymbolRecognition\\left_handed_ticks.h5" # honours lab pc
-        model_path = "C:\\Users\\Joshua\\MarkingSymbolRecognition\\left_handed_ticks.h5" # josh's pc
+        model_path = os.path.join(os.getcwd(), "left_handed_ticks.h5") # josh's pc
 
     symbol_model = SymbolRecognitionModel(model_path)
     
@@ -54,7 +52,7 @@ def main(pdf_path, submission_id, TotalMark, MarkingStyle, show_plots=False):
     else:
         total_mark = round((float(ticks_detected) / float(TotalMark)) * 100,2)
 
-    server_url = "http://10.0.0.107:8080"
+    server_url = "http://10.202.130.155:8080"
     update_submission_mark(server_url, submission_id, total_mark)
     for question_id, mark_allocation in ticks_per_question.items():
         update_question_mark(server_url, submission_id, question_id, mark_allocation)

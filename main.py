@@ -35,12 +35,15 @@ def update_question_mark(server_url, submission_id, question_id, mark_allocation
         print(f"Failed to update question ID {question_id} for submission ID {submission_id}. Error: {e}")
 
 def main(pdf_path, submission_id, TotalMark, MarkingStyle, show_plots=False):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     MarkingStyle = MarkingStyle.strip().strip('"')
-    if MarkingStyle == "Right Handed Ticks":
-        model_path = os.path.join(os.getcwd(), "right_handed_ticks.h5") # josh's pc
-    else:
-        model_path = os.path.join(os.getcwd(), "left_handed_ticks.h5") # josh's pc
 
+    if MarkingStyle == "Right Handed Ticks":
+        model_path = os.path.join(script_dir, "right_handed_ticks.h5")
+    else:
+        model_path = os.path.join(script_dir, "left_handed_ticks.h5")
+
+    print(model_path)
     symbol_model = SymbolRecognitionModel(model_path)
     
     ticks_detected, ticks_per_question = symbol_model.predict_from_pdf(pdf_path, show_plots=show_plots)
@@ -52,7 +55,7 @@ def main(pdf_path, submission_id, TotalMark, MarkingStyle, show_plots=False):
     else:
         total_mark = round((float(ticks_detected) / float(TotalMark)) * 100,2)
 
-    server_url = "http://10.202.130.155:8080"
+    server_url = "http://10.0.0.107:8080"
     update_submission_mark(server_url, submission_id, total_mark)
     for question_id, mark_allocation in ticks_per_question.items():
         update_question_mark(server_url, submission_id, question_id, mark_allocation)

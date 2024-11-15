@@ -9,4 +9,4 @@ MarkingSymbolRecognition is a deep learning-based module designed to classify ma
   * Component of MAAT: Serves as one of the building blocks for the Mobile Assessment and Annotation Tool.
 
 ## Disclaimer
-This is part of a Postgraduate Research for Nelson Mandela University and remains their intellectual property.
+This project is part of a Postgraduate Research for Nelson Mandela University and remains their intellectual property.

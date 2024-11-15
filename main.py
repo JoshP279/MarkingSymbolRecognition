@@ -54,8 +54,9 @@ def main(pdf_path, submission_id, TotalMark, MarkingStyle, show_plots=False):
         total_mark = 0
     else:
         total_mark = round((float(ticks_detected) / float(TotalMark)) * 100,2)
+        total_mark = max(0, min(total_mark, 100))
 
-    server_url = "http://10.0.0.107:8080"
+    server_url = "http://192.168.202.75:8080"
     update_submission_mark(server_url, submission_id, total_mark)
     for question_id, mark_allocation in ticks_per_question.items():
         update_question_mark(server_url, submission_id, question_id, mark_allocation)
